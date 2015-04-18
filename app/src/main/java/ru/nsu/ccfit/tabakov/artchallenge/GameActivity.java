@@ -35,6 +35,8 @@ public class GameActivity  extends Activity implements View.OnClickListener {
     private ImageView imageViewPicture;
     private RatingBar ratingBar;
     private IPainterApi restApi;
+    private ITranslationApi restApi2;
+    private Translation translation;
     private ArrayList<Integer> setPainters = new ArrayList<Integer>(Arrays.asList(2,3,9,16,17,21,30,36,49,53,57,60,61,69,77,84,94,96));
 
 
@@ -46,6 +48,20 @@ public class GameActivity  extends Activity implements View.OnClickListener {
         setButtonText();
         setNewPicture(idPainter);
         setListener(this);
+
+
+        restApi2.getTranslation("ru", new Callback<Translation>() {
+            @Override
+            public void success(Translation translation, Response response) {
+                Log.i("qwer", translation.painters.get(1));
+                setTranslation(translation);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+
+            }
+        });
 
     }
 
@@ -78,6 +94,11 @@ public class GameActivity  extends Activity implements View.OnClickListener {
                 .setEndpoint("http://artchallenge.me")
                 .build();
         restApi = restAdapter.create(IPainterApi.class);
+
+        RestAdapter build = new RestAdapter.Builder()
+                .setEndpoint("http://artchallenge.ru")
+                .build();
+        restApi2 = build.create(ITranslationApi.class);
 
         setButton.add((Button) findViewById(R.id.buttonPainter_1));
         setButton.add((Button) findViewById(R.id.buttonPainter_2));
@@ -128,6 +149,7 @@ public class GameActivity  extends Activity implements View.OnClickListener {
             setButton.get(i).setText(textButton);
         }
         Log.i("qwer", "правильная кнопка " + String.valueOf(numTrueButton));
+        Log.i("qwer", translation.painters.get(1));
     }
 
     private int randomInt(int start, int end) {
@@ -183,6 +205,9 @@ public class GameActivity  extends Activity implements View.OnClickListener {
                 error.printStackTrace();
             }
         });
+    }
 
+    public void setTranslation(Translation translation) {
+        this.translation = translation;
     }
 }
