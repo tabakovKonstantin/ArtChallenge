@@ -2,22 +2,17 @@ package ru.nsu.ccfit.tabakov.artchallenge;
 
 import android.app.Activity;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.Toast;
 
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -31,22 +26,19 @@ import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-import static ru.nsu.ccfit.tabakov.artchallenge.R.color.orange;
-
 /**
  * Created by Константин on 18.04.2015.
  */
 public class GameActivity  extends Activity implements View.OnClickListener {
     private static final String BASE_URL = "http://artchallenge.me";
-    private ArrayList<Button> setButton = new ArrayList<Button>();
+    private ArrayList<Button> setButtons = new ArrayList<Button>();
+    private ArrayList<ImageView> setImageViews = new ArrayList<ImageView>();
     private int numTrueButton;
     private int idPainter;
     private ImageView imageViewPicture;
     private IPainterApi restApi;
     private Translation translation;
     private ArrayList<Integer> setPainters = new ArrayList<Integer>(Arrays.asList(2,3,9,16,17,21,30,36,49,53,57,60,61,69,77,84,94,96));
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +56,6 @@ public class GameActivity  extends Activity implements View.OnClickListener {
             public void success(Translation translation, Response response) {
                 setButtonText(translation);
                 setNewPicture(idPainter);
-                setClickable(true);
                 setTranslation(translation);
             }
 
@@ -73,8 +64,6 @@ public class GameActivity  extends Activity implements View.OnClickListener {
 
             }
         });
-
-
 
     }
 
@@ -112,24 +101,35 @@ public class GameActivity  extends Activity implements View.OnClickListener {
                 .build();
         restApi = restAdapter.create(IPainterApi.class);
 
-        setButton.add((Button) findViewById(R.id.buttonPainter_1));
-        setButton.add((Button) findViewById(R.id.buttonPainter_2));
-        setButton.add((Button) findViewById(R.id.buttonPainter_3));
-        setButton.add((Button) findViewById(R.id.buttonPainter_4));
+        setButtons.add((Button) findViewById(R.id.buttonPainter_1));
+        setButtons.add((Button) findViewById(R.id.buttonPainter_2));
+        setButtons.add((Button) findViewById(R.id.buttonPainter_3));
+        setButtons.add((Button) findViewById(R.id.buttonPainter_4));
 
         imageViewPicture = (ImageView) findViewById(R.id.imageViewmPicture);
+
+        setImageViews.add((ImageView) findViewById(R.id.imageView_1));
+        setImageViews.add((ImageView) findViewById(R.id.imageView_2));
+        setImageViews.add((ImageView) findViewById(R.id.imageView_3));
+        setImageViews.add((ImageView) findViewById(R.id.imageView_4));
+        setImageViews.add((ImageView) findViewById(R.id.imageView_5));
+        setImageViews.add((ImageView) findViewById(R.id.imageView_6));
+        setImageViews.add((ImageView) findViewById(R.id.imageView_7));
+        setImageViews.add((ImageView) findViewById(R.id.imageView_8));
+        setImageViews.add((ImageView) findViewById(R.id.imageView_9));
+        setImageViews.add((ImageView) findViewById(R.id.imageView_10));
 
     }
 
     private void setListener(View.OnClickListener listener) {
-        for(Button button : setButton) {
+        for(Button button : setButtons) {
             button.setOnClickListener(listener);
         }
         imageViewPicture.setOnClickListener(listener);
     }
 
     private void setClickable(boolean enableButton) {
-        for(Button button : setButton) {
+        for(Button button : setButtons) {
             button.setClickable(enableButton);
         }
     }
@@ -138,6 +138,9 @@ public class GameActivity  extends Activity implements View.OnClickListener {
         if (numAnswer == numTrueButton) {
             Log.i("qwer", "Выбран правильный ответ");
             Toast.makeText(this, getGoodText(), Toast.LENGTH_SHORT).show();
+            Picasso.with(GameActivity.this)
+                    .load("C:\\Users\\Константин\\AndroidStudioProjects\\ArtChallenge\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher.png")
+                    .into(setImageViews.get(1));
 
             //добавить зеленую звездочку
         } else {
@@ -150,20 +153,21 @@ public class GameActivity  extends Activity implements View.OnClickListener {
 
         setButtonText(translation);
         setNewPicture(idPainter);
+
         Log.i("qwer", "Художник " + String.valueOf(idPainter));
     }
 
     private void setBackgroundColor(int trueAnswerNum, int falseAnswerNum) {
         if(trueAnswerNum == falseAnswerNum) {
-            setButton.get(trueAnswerNum - 1).setTextColor(Color.BLUE);
+            setButtons.get(trueAnswerNum - 1).setTextColor(Color.BLUE);
         } else {
-            setButton.get(trueAnswerNum - 1).setTextColor(Color.BLUE);
-            setButton.get(falseAnswerNum-1).setTextColor(Color.RED);
+            setButtons.get(trueAnswerNum - 1).setTextColor(Color.BLUE);
+            setButtons.get(falseAnswerNum - 1).setTextColor(Color.RED);
         }
     }
 
     private void resetBackgroundColor() {
-        for(Button button : setButton) {
+        for(Button button : setButtons) {
             button.setTextColor(Color.BLACK);
         }
         Log.i("rewq","vizov");
@@ -184,13 +188,13 @@ public class GameActivity  extends Activity implements View.OnClickListener {
 
     private void setButtonText(Translation translation) {
 
-        ArrayList<Integer> uniqSet = randomSet(1, setPainters.size(), setButton.size());
+        ArrayList<Integer> uniqSet = randomSet(1, setPainters.size(), setButtons.size());
         numTrueButton = randomInt(1, 4);
         idPainter = uniqSet.get(numTrueButton-1);
 
         for (int i = 0; i < uniqSet.size(); i++) {
             String textButton = translation.getPainters().get(uniqSet.get(i));
-            setButton.get(i).setText(textButton);
+            setButtons.get(i).setText(textButton);
         }
         Log.i("rewq", "правильная кнопка " + String.valueOf(numTrueButton) + "  " + translation.getPainters().get(idPainter));
     }
@@ -245,6 +249,7 @@ public class GameActivity  extends Activity implements View.OnClickListener {
                             public void onSuccess() {
 
                                 resetBackgroundColor();
+                                setClickable(true);
                             }
 
                             @Override
