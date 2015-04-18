@@ -1,17 +1,24 @@
 package ru.nsu.ccfit.tabakov.artchallenge;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
@@ -22,18 +29,12 @@ import retrofit.client.Response;
  * Created by Константин on 18.04.2015.
  */
 public class GameActivity  extends Activity implements View.OnClickListener {
-    private Button buttonPainter_1;
-    private Button buttonPainter_2;
-    private Button buttonPainter_3;
-    private Button buttonPainter_4;
-//    ArrayList<Button> setButton = new ArrayList<Button>(Arrays.asList(buttonPainter_1, buttonPainter_2, buttonPainter_3, buttonPainter_4));
-    ArrayList<Button> setButton = new ArrayList<Button>();
-
-
+    private ArrayList<Button> setButton = new ArrayList<Button>();
+    private int numTrueButton;
+    private int idPainter;
     private ImageView imageViewPicture;
-
+    private RatingBar ratingBar;
     private IPainterApi restApi;
-
     private ArrayList<Integer> setPainters = new ArrayList<Integer>(Arrays.asList(2,3,9,16,17,21,30,36,49,53,57,60,61,69,77,84,94,96));
 
 
@@ -42,6 +43,8 @@ public class GameActivity  extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game);
         initComponents();
+        setButtonText();
+        setNewPicture(idPainter);
         setListener(this);
 
     }
@@ -58,11 +61,11 @@ public class GameActivity  extends Activity implements View.OnClickListener {
                 break;
             }
             case R.id.buttonPainter_3: {
-                checkTruePainter(2);
+                checkTruePainter(3);
                 break;
             }
             case R.id.buttonPainter_4: {
-                checkTruePainter(2);
+                checkTruePainter(4);
                 break;
             }
         }
@@ -76,14 +79,15 @@ public class GameActivity  extends Activity implements View.OnClickListener {
                 .build();
         restApi = restAdapter.create(IPainterApi.class);
 
+        setButton.add((Button) findViewById(R.id.buttonPainter_1));
         setButton.add((Button) findViewById(R.id.buttonPainter_2));
         setButton.add((Button) findViewById(R.id.buttonPainter_3));
         setButton.add((Button) findViewById(R.id.buttonPainter_4));
 
         imageViewPicture = (ImageView) findViewById(R.id.imageViewmPicture);
+
+        ratingBar = (RatingBar) findViewById(R.id.ratingBar);
     }
-
-
 
     private void setListener(View.OnClickListener listener) {
         for(Button button : setButton) {
@@ -92,21 +96,38 @@ public class GameActivity  extends Activity implements View.OnClickListener {
     }
 
     private void checkTruePainter(int numAnswer) {
-        int numTruePaintet = 1;
-        if (numAnswer == numTruePaintet) {
+        LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
+        stars.getDrawable(0).setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
+        stars.getDrawable(1).setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+        stars.getDrawable(2).setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_ATOP);
+
+        if (numAnswer == numTrueButton) {
             Log.i("qwer", "Выбран правильный ответ");
+            ratingBar.setRating(5);
+
             //добавить зеленую звездочку
         } else {
             Log.i("qwer", "Выбран не правильный ответ");
             //добавить красную звездочку
+//            ratingBar.setNumStars(1);
         }
-        int tmp = randomInt(1, setPainters.size());
-        int idPainter = setPainters.get(tmp);
-        int numTrueButton = randomInt(1, 4);
 
-        Log.i("qwer", "Художник " + String.valueOf(idPainter));
+        setButtonText();
         setNewPicture(idPainter);
+        Log.i("qwer", "Художник " + String.valueOf(idPainter));
+    }
 
+    private void setButtonText() {
+
+        ArrayList<Integer> uniqSet = randomSet(1, setPainters.size(), setButton.size());
+        numTrueButton = randomInt(0, 3);
+        idPainter = uniqSet.get(numTrueButton);
+
+        for (int i = 0; i < uniqSet.size(); i++) {
+            String textButton = String.valueOf(uniqSet.get(i));
+            setButton.get(i).setText(textButton);
+        }
+        Log.i("qwer", "правильная кнопка " + String.valueOf(numTrueButton));
     }
 
     private int randomInt(int start, int end) {
@@ -118,6 +139,14 @@ public class GameActivity  extends Activity implements View.OnClickListener {
             }
         }
 
+    }
+
+    private ArrayList<Integer> randomSet(int start, int end, int size) {
+        Set<Integer> uniqSet = new HashSet<Integer>();
+        while (uniqSet.size() < size) {
+            uniqSet.add(randomInt(start,end));
+        }
+        return new ArrayList<Integer>(uniqSet);
     }
 
     private String createUrlForPicture(int idPainter, int pictureQuantity) {
@@ -135,7 +164,8 @@ public class GameActivity  extends Activity implements View.OnClickListener {
         restApi.getPainter(idPainter, new Callback<Painter>() {
             @Override
             public void success(Painter painter, Response response) {
-                Log.i("qwer", "answer " + painter.getName() + painter.getId() + painter.getPictureQuantity());
+
+                Log.i("qwer", "answer " + response.getBody().mimeType());
                 int pictureQuantity = painter.getPictureQuantity();
                 Log.i("qwer", "картин у художника " + String.valueOf(pictureQuantity));
                 String url = createUrlForPicture(idPainter, pictureQuantity);
@@ -149,6 +179,7 @@ public class GameActivity  extends Activity implements View.OnClickListener {
             @Override
             public void failure(RetrofitError error) {
                 Log.i("qwer", error.getMessage());
+                Log.i("qwer",  String.valueOf(error.getResponse().getStatus()));
                 error.printStackTrace();
             }
         });
