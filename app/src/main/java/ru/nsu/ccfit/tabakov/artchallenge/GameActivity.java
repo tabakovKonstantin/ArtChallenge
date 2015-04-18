@@ -45,7 +45,7 @@ public class GameActivity  extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game);
         initComponents();
-        setButtonText();
+
         setNewPicture(idPainter);
         setListener(this);
 
@@ -53,7 +53,8 @@ public class GameActivity  extends Activity implements View.OnClickListener {
         restApi2.getTranslation("ru", new Callback<Translation>() {
             @Override
             public void success(Translation translation, Response response) {
-                Log.i("qwer", translation.painters.get(1));
+                Log.i("qwer", translation.painters.get(2));
+                setButtonText(translation);
                 setTranslation(translation);
             }
 
@@ -62,6 +63,8 @@ public class GameActivity  extends Activity implements View.OnClickListener {
 
             }
         });
+
+
 
     }
 
@@ -133,23 +136,22 @@ public class GameActivity  extends Activity implements View.OnClickListener {
 //            ratingBar.setNumStars(1);
         }
 
-        setButtonText();
+        setButtonText(translation);
         setNewPicture(idPainter);
         Log.i("qwer", "Художник " + String.valueOf(idPainter));
     }
 
-    private void setButtonText() {
+    private void setButtonText(Translation translation) {
 
         ArrayList<Integer> uniqSet = randomSet(1, setPainters.size(), setButton.size());
         numTrueButton = randomInt(0, 3);
         idPainter = uniqSet.get(numTrueButton);
 
         for (int i = 0; i < uniqSet.size(); i++) {
-            String textButton = String.valueOf(uniqSet.get(i));
+            String textButton = translation.painters.get(uniqSet.get(i));
             setButton.get(i).setText(textButton);
         }
         Log.i("qwer", "правильная кнопка " + String.valueOf(numTrueButton));
-        Log.i("qwer", translation.painters.get(1));
     }
 
     private int randomInt(int start, int end) {
@@ -201,7 +203,7 @@ public class GameActivity  extends Activity implements View.OnClickListener {
             @Override
             public void failure(RetrofitError error) {
                 Log.i("qwer", error.getMessage());
-                Log.i("qwer",  String.valueOf(error.getResponse().getStatus()));
+//                Log.i("qwer",  String.valueOf(error.getResponse().getStatus()));
                 error.printStackTrace();
             }
         });
