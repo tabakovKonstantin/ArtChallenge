@@ -10,4 +10,7 @@ import retrofit.http.Path;
 public interface IPainterApi {
     @GET("/painters/{painter_id}/data.json")
     public void getPainter(@Path("painter_id") int painter_id, Callback<Painter> callback);
+
+    @GET("/locales/{locales}/translation.json")
+    public void getTranslation(@Path("locales") String locales, Callback<Translation> callback);
 }

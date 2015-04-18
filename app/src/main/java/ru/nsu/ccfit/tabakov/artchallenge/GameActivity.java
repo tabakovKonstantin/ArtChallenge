@@ -35,7 +35,6 @@ public class GameActivity  extends Activity implements View.OnClickListener {
     private ImageView imageViewPicture;
     private RatingBar ratingBar;
     private IPainterApi restApi;
-    private ITranslationApi restApi2;
     private Translation translation;
     private ArrayList<Integer> setPainters = new ArrayList<Integer>(Arrays.asList(2,3,9,16,17,21,30,36,49,53,57,60,61,69,77,84,94,96));
 
@@ -46,15 +45,19 @@ public class GameActivity  extends Activity implements View.OnClickListener {
         setContentView(R.layout.game);
         initComponents();
 
-        setNewPicture(idPainter);
+
         setListener(this);
 
 
-        restApi2.getTranslation("ru", new Callback<Translation>() {
+        restApi.getTranslation("ru", new Callback<Translation>() {
             @Override
             public void success(Translation translation, Response response) {
-                Log.i("qwer", translation.painters.get(2));
+                Log.i("qwer", "Transl " + translation.painters.get(2));
                 setButtonText(translation);
+                setNewPicture(idPainter);
+                for(Button button : setButton) {
+                    button.setClickable(true);
+                }
                 setTranslation(translation);
             }
 
@@ -98,11 +101,6 @@ public class GameActivity  extends Activity implements View.OnClickListener {
                 .build();
         restApi = restAdapter.create(IPainterApi.class);
 
-        RestAdapter build = new RestAdapter.Builder()
-                .setEndpoint("http://artchallenge.ru")
-                .build();
-        restApi2 = build.create(ITranslationApi.class);
-
         setButton.add((Button) findViewById(R.id.buttonPainter_1));
         setButton.add((Button) findViewById(R.id.buttonPainter_2));
         setButton.add((Button) findViewById(R.id.buttonPainter_3));
@@ -116,6 +114,7 @@ public class GameActivity  extends Activity implements View.OnClickListener {
     private void setListener(View.OnClickListener listener) {
         for(Button button : setButton) {
             button.setOnClickListener(listener);
+            button.setClickable(false);
         }
     }
 
@@ -184,7 +183,7 @@ public class GameActivity  extends Activity implements View.OnClickListener {
     }
 
     private void setNewPicture(final int idPainter) {
-        Log.i("qwer", String.valueOf(idPainter));
+        Log.i("qwer", "sdf"+String.valueOf(idPainter));
         restApi.getPainter(idPainter, new Callback<Painter>() {
             @Override
             public void success(Painter painter, Response response) {
