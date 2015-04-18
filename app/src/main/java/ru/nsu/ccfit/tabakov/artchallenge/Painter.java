@@ -16,7 +16,7 @@ public class Painter {
         return name;
     }
 
-    public int getPaintings() {
+    public int getPictureQuantity() {
         return paintings;
     }
 }
