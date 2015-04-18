@@ -9,6 +9,8 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import retrofit.Callback;
@@ -24,8 +26,15 @@ public class GameActivity  extends Activity implements View.OnClickListener {
     private Button buttonPainter_2;
     private Button buttonPainter_3;
     private Button buttonPainter_4;
+//    ArrayList<Button> setButton = new ArrayList<Button>(Arrays.asList(buttonPainter_1, buttonPainter_2, buttonPainter_3, buttonPainter_4));
+    ArrayList<Button> setButton = new ArrayList<Button>();
+
 
     private ImageView imageViewPicture;
+
+    private IPainterApi restApi;
+
+    private ArrayList<Integer> setPainters = new ArrayList<Integer>(Arrays.asList(2,3,9,16,17,21,30,36,49,53,57,60,61,69,77,84,94,96));
 
 
     @Override
@@ -61,20 +70,25 @@ public class GameActivity  extends Activity implements View.OnClickListener {
     }
 
     private void initComponents() {
-        buttonPainter_1 = (Button) findViewById(R.id.buttonPainter_1);
-        buttonPainter_2 = (Button) findViewById(R.id.buttonPainter_2);
-        buttonPainter_3 = (Button) findViewById(R.id.buttonPainter_3);
-        buttonPainter_4 = (Button) findViewById(R.id.buttonPainter_4);
+
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint("http://artchallenge.me")
+                .build();
+        restApi = restAdapter.create(IPainterApi.class);
+
+        setButton.add((Button) findViewById(R.id.buttonPainter_2));
+        setButton.add((Button) findViewById(R.id.buttonPainter_3));
+        setButton.add((Button) findViewById(R.id.buttonPainter_4));
 
         imageViewPicture = (ImageView) findViewById(R.id.imageViewmPicture);
     }
 
-    private void setListener(View.OnClickListener listener) {
-        buttonPainter_1.setOnClickListener(listener);
-        buttonPainter_2.setOnClickListener(listener);
-        buttonPainter_3.setOnClickListener(listener);
-        buttonPainter_4.setOnClickListener(listener);
 
+
+    private void setListener(View.OnClickListener listener) {
+        for(Button button : setButton) {
+            button.setOnClickListener(listener);
+        }
     }
 
     private void checkTruePainter(int numAnswer) {
@@ -86,7 +100,10 @@ public class GameActivity  extends Activity implements View.OnClickListener {
             Log.i("qwer", "Выбран не правильный ответ");
             //добавить красную звездочку
         }
-        int idPainter = randomInt(1,10);
+        int tmp = randomInt(1, setPainters.size());
+        int idPainter = setPainters.get(tmp);
+        int numTrueButton = randomInt(1, 4);
+
         Log.i("qwer", "Художник " + String.valueOf(idPainter));
         setNewPicture(idPainter);
 
@@ -114,10 +131,7 @@ public class GameActivity  extends Activity implements View.OnClickListener {
     }
 
     private void setNewPicture(final int idPainter) {
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint("http://artchallenge.me")
-                .build();
-        IPainterApi restApi = restAdapter.create(IPainterApi.class);
+        Log.i("qwer", String.valueOf(idPainter));
         restApi.getPainter(idPainter, new Callback<Painter>() {
             @Override
             public void success(Painter painter, Response response) {
@@ -135,6 +149,7 @@ public class GameActivity  extends Activity implements View.OnClickListener {
             @Override
             public void failure(RetrofitError error) {
                 Log.i("qwer", error.getMessage());
+                error.printStackTrace();
             }
         });
 

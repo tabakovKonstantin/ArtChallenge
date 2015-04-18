@@ -19,5 +19,17 @@ public class Painter {
     public int getPictureQuantity() {
         return paintings;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPaintings(int paintings) {
+        this.paintings = paintings;
+    }
 }
 
