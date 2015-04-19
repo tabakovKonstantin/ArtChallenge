@@ -10,5 +10,4 @@ import retrofit.http.Path;
 public interface ITranslationApi {
     @GET("/locales/{locales}/translation.json")
     public void getTranslation(@Path("locales") String locales, Callback<Translation> callback);
-//    public Translation getTranslation(@Path("locales") String locales);
 }
