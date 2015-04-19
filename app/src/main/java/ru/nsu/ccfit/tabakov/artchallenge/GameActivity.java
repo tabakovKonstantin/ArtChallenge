@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.squareup.picasso.MemoryPolicy;
@@ -31,10 +32,12 @@ import retrofit.client.Response;
  */
 public class GameActivity  extends Activity implements View.OnClickListener {
     private static final String BASE_URL = "http://artchallenge.me";
+    private static final int MAX_ANSWER = 10;
     private ArrayList<Button> setButtons = new ArrayList<Button>();
-    private ArrayList<ImageView> setImageViews = new ArrayList<ImageView>();
     private int numTrueButton;
     private int idPainter;
+    private int countTrueAnswer = 0;
+    private ProgressBar progressBar;
     private ImageView imageViewPicture;
     private IPainterApi restApi;
     private Translation translation;
@@ -108,17 +111,8 @@ public class GameActivity  extends Activity implements View.OnClickListener {
 
         imageViewPicture = (ImageView) findViewById(R.id.imageViewmPicture);
 
-        setImageViews.add((ImageView) findViewById(R.id.imageView_1));
-        setImageViews.add((ImageView) findViewById(R.id.imageView_2));
-        setImageViews.add((ImageView) findViewById(R.id.imageView_3));
-        setImageViews.add((ImageView) findViewById(R.id.imageView_4));
-        setImageViews.add((ImageView) findViewById(R.id.imageView_5));
-        setImageViews.add((ImageView) findViewById(R.id.imageView_6));
-        setImageViews.add((ImageView) findViewById(R.id.imageView_7));
-        setImageViews.add((ImageView) findViewById(R.id.imageView_8));
-        setImageViews.add((ImageView) findViewById(R.id.imageView_9));
-        setImageViews.add((ImageView) findViewById(R.id.imageView_10));
-
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setMax(MAX_ANSWER);
     }
 
     private void setListener(View.OnClickListener listener) {
@@ -136,32 +130,32 @@ public class GameActivity  extends Activity implements View.OnClickListener {
 
     private void checkTruePainter(int numAnswer) {
         if (numAnswer == numTrueButton) {
+            countTrueAnswer ++;
+            Toast.makeText(this, translation.getRandGoodPhrases(), Toast.LENGTH_SHORT).show();
             Log.i("qwer", "Выбран правильный ответ");
-            Toast.makeText(this, getGoodText(), Toast.LENGTH_SHORT).show();
-            Picasso.with(GameActivity.this)
-                    .load("C:\\Users\\Константин\\AndroidStudioProjects\\ArtChallenge\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher.png")
-                    .into(setImageViews.get(1));
-
-            //добавить зеленую звездочку
         } else {
+            countTrueAnswer = 0;
+            Toast.makeText(this, translation.getRandBadPhrases(), Toast.LENGTH_SHORT).show();
             Log.i("qwer", "Выбран не правильный ответ");
-            Toast.makeText(this, getBadText(), Toast.LENGTH_SHORT).show();
-            //добавить красную звездочку
-//            ratingBar.setNumStars(1);
         }
-        setBackgroundColor(numTrueButton, numAnswer);
 
-        setButtonText(translation);
-        setNewPicture(idPainter);
+        progressBar.setProgress(countTrueAnswer);
+        if(countTrueAnswer != MAX_ANSWER) {
+            setBackgroundColor(numTrueButton, numAnswer);
+            setButtonText(translation);
+            setNewPicture(idPainter);
+            Log.i("qwer", "Художник " + String.valueOf(idPainter));
+        } else {
+            Log.i("rewq", "WIN ");
+        }
 
-        Log.i("qwer", "Художник " + String.valueOf(idPainter));
     }
 
     private void setBackgroundColor(int trueAnswerNum, int falseAnswerNum) {
         if(trueAnswerNum == falseAnswerNum) {
-            setButtons.get(trueAnswerNum - 1).setTextColor(Color.BLUE);
+            setButtons.get(trueAnswerNum - 1).setTextColor(Color.GREEN);
         } else {
-            setButtons.get(trueAnswerNum - 1).setTextColor(Color.BLUE);
+            setButtons.get(trueAnswerNum - 1).setTextColor(Color.GREEN);
             setButtons.get(falseAnswerNum - 1).setTextColor(Color.RED);
         }
     }
@@ -173,24 +167,14 @@ public class GameActivity  extends Activity implements View.OnClickListener {
         Log.i("rewq","vizov");
     }
 
-    private String getGoodText() {
-        Map<Integer, String> goodTextMap = translation.getGoodPhrases();
-        int numText = randomInt(1, goodTextMap.size());
-        return goodTextMap.get(numText);
-    }
 
-    private String getBadText() {
-        Map<Integer, String> badTextMap = translation.getBadPhrases();
-        int numText = randomInt(1, badTextMap.size());
-        return badTextMap.get(numText);
-    }
 
 
     private void setButtonText(Translation translation) {
 
-        ArrayList<Integer> uniqSet = randomSet(1, setPainters.size(), setButtons.size());
-        numTrueButton = randomInt(1, 4);
-        idPainter = uniqSet.get(numTrueButton-1);
+        ArrayList<Integer> uniqSet = RandomMath.randomSet(1, setPainters.size(), setButtons.size());
+        numTrueButton = RandomMath.randomInt(1, 4);
+        idPainter = uniqSet.get(numTrueButton - 1);
 
         for (int i = 0; i < uniqSet.size(); i++) {
             String textButton = translation.getPainters().get(uniqSet.get(i));
@@ -199,27 +183,10 @@ public class GameActivity  extends Activity implements View.OnClickListener {
         Log.i("rewq", "правильная кнопка " + String.valueOf(numTrueButton) + "  " + translation.getPainters().get(idPainter));
     }
 
-    private int randomInt(int start, int end) {
-        Random rand = new Random();
-        while (true) {
-            int value = rand.nextInt((end - start) + 1) + start;
-            if(value != 0) {
-                return value;
-            }
-        }
 
-    }
-
-    private ArrayList<Integer> randomSet(int start, int end, int size) {
-        Set<Integer> uniqSet = new HashSet<Integer>();
-        while (uniqSet.size() < size) {
-            uniqSet.add(randomInt(start,end));
-        }
-        return new ArrayList<Integer>(uniqSet);
-    }
 
     private String createUrlForPicture(int idPainter, int pictureQuantity) {
-        int numPicture = randomInt(1, pictureQuantity);
+        int numPicture = RandomMath.randomInt(1, pictureQuantity);
         Log.i("qwer", "картина художника " + String.valueOf(numPicture));
         return BASE_URL
                 .concat("/painters/")

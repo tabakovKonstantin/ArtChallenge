@@ -33,4 +33,14 @@ public class Translation {
     public void setGoodPhrases(Map<Integer, String> goodPhrases) {
         this.goodPhrases = goodPhrases;
     }
+
+    public String getRandGoodPhrases() {
+        int numText = RandomMath.randomInt(1, getGoodPhrases().size());
+        return getGoodPhrases().get(numText);
+    }
+
+    public String getRandBadPhrases() {
+        int numText = RandomMath.randomInt(1, getBadPhrases().size());
+        return getBadPhrases().get(numText);
+    }
 }
