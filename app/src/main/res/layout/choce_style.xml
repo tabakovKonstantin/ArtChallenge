@@ -9,7 +9,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/textView_1"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:autoText="false" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -100,4 +101,22 @@
         android:layout_alignTop="@+id/textView_6"
         android:layout_alignLeft="@+id/imageButton_5"
         android:layout_alignStart="@+id/imageButton_5" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView_7"
+        android:layout_below="@+id/imageButton_6"
+        android:layout_alignLeft="@+id/textView_6"
+        android:layout_alignStart="@+id/textView_6"
+        android:layout_marginTop="20dp" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageButton_7"
+        android:layout_alignBottom="@+id/textView_7"
+        android:layout_alignLeft="@+id/imageButton_6"
+        android:layout_alignStart="@+id/imageButton_6" />
+
 </RelativeLayout>

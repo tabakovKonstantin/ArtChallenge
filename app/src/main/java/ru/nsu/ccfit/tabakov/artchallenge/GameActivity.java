@@ -42,7 +42,7 @@ public class GameActivity  extends Activity implements View.OnClickListener {
 
     private IPainterApi restApi;
     private Translation translation;
-    private ArrayList<Integer> setPainters = new ArrayList<Integer>(Arrays.asList(2,3,9,16,17,21,30,36,49,53,57,60,61,69,77,84,94,96));
+    private ArrayList<Integer> setPainters;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,6 @@ public class GameActivity  extends Activity implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.buttonPainter_1: {
                 checkTruePainter(1);
-                startActivity(new Intent(this, ChoiceStyleActivity.class));
                 break;
             }
             case R.id.buttonPainter_2: {
@@ -81,6 +80,9 @@ public class GameActivity  extends Activity implements View.OnClickListener {
     }
 
     private void initComponents() {
+
+        setTranslation((Translation) getIntent().getSerializableExtra("Translation"));
+        setPainters = (ArrayList<Integer>) getIntent().getSerializableExtra("setPainters");
 
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(BASE_URL)
@@ -141,21 +143,9 @@ public class GameActivity  extends Activity implements View.OnClickListener {
     }
 
     private void startGame() {
-        String locale = Locale.getDefault().getLanguage();
         setClickable(false);
-        restApi.getTranslation(locale, new Callback<Translation>() {
-            @Override
-            public void success(Translation translation, Response response) {
-                setButtonText(translation);
-                setNewPicture(idPainter);
-                setTranslation(translation);
-            }
-            @Override
-            public void failure(RetrofitError error) {
-                Log.e("ArtChallengeError", error.getMessage());
-            }
-        });
-        Log.i("ArtChallengeInfo", "Game start. " + "Language game: " + locale);
+        setButtonText(translation);
+        setNewPicture(idPainter);
     }
 
     private void checkTruePainter(int numButtonAnswer) {
@@ -175,6 +165,8 @@ public class GameActivity  extends Activity implements View.OnClickListener {
             setButtonText(translation);
             setNewPicture(idPainter);
         } else {
+            countTrueAnswer = 0;
+            startActivity(new Intent(this, WinActivity.class ));
             Log.i("ArtChallengeGame", "You are WIN!!!");
         }
 
