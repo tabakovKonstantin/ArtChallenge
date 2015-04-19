@@ -1,6 +1,7 @@
 package ru.nsu.ccfit.tabakov.artchallenge;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -57,6 +58,7 @@ public class GameActivity  extends Activity implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.buttonPainter_1: {
                 checkTruePainter(1);
+                startActivity(new Intent(this, ChoiceStyleActivity.class));
                 break;
             }
             case R.id.buttonPainter_2: {

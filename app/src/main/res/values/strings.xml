@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Art Challenge</string>
+    <string name="win_text">You Win!</string>
+    <string name="repet">Повторить</string>
 </resources>

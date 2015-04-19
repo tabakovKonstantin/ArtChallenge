@@ -1,5 +1,7 @@
 package ru.nsu.ccfit.tabakov.artchallenge;
 
+import java.io.Serializable;
+
 import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.Path;

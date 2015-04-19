@@ -1,14 +1,16 @@
 package ru.nsu.ccfit.tabakov.artchallenge;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  * Created by Константин on 18.04.2015.
  */
-public class Translation {
+public class Translation implements Serializable{
     private Map<Integer, String> painters;
     private Map<Integer, String> badPhrases;
     private Map<Integer, String>  goodPhrases;
+    private Map<String, String>  sets;
 
     public Map<Integer, String> getPainters() {
         return painters;
@@ -32,6 +34,14 @@ public class Translation {
 
     public void setGoodPhrases(Map<Integer, String> goodPhrases) {
         this.goodPhrases = goodPhrases;
+    }
+
+    public Map<String, String> getSets() {
+        return sets;
+    }
+
+    public void setSets(Map<String, String> sets) {
+        this.sets = sets;
     }
 
     public String getRandGoodPhrases() {
